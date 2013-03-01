@@ -19,10 +19,11 @@ $do_ipviking = TRUE;			// default API lookup
 $filename = '';
 $type='ipfw';					// default type
 
-$options = getopt("f:t:hci");
+$options = getopt("f:t:g:hci");
 if(isset($options['h']))  $help = TRUE;
 if(isset($options['c'])) $do_color = FALSE;
 if(isset($options['i'])) $do_ipviking = FALSE;
+
 if(isset($options['f']) AND $options['f']!="") {
         $filename = $options['f'];
         if(!file_exists($filename)) {
