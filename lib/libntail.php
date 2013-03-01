@@ -29,6 +29,38 @@ function split_ipfw_words($logbuffer)
   return FALSE;
 }
 
+function split_nginx_words($logbuffer)
+{
+	$res = array();
+	// pattern to match all ipfw syslog msg
+	//IP - - [DATETIME] "GET|POST|PUT UR HTTP/1.1" CODE BYTES "HOST" "USER-AGENT" "REF"
+	//50.150.127.59 - - [28/Feb/2013:23:23:13 -0800] "GET /json/top_country_attacks/since/1362122531 HTTP/1.1" 200 631 "http://www.norse-corp.com/" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17" "-"
+	preg_match('/[^ ]+ \- \[(.+?)\] "(.+?)" "([^ ]+) ([^ ]+) .*?" ([0-9]+) \(([0-9]+)\) "(.*?)" "([^ ]+) (.*?)" \[([0-9.]+)\]/', $logbuffer, $matches);
+	var_dump($matches);
+		
+	/*
+	$res['time'] = $matches[1]." ".$matches[2];
+		$res['pri'] = $matches[3];
+		$res['host'] = substr($matches[4],0,8);
+		$res['level'] = $matches[5];
+		$res['app'] = $matches[6];
+		$res['rulenum'] = $matches[7];
+		$res['action'] = $matches[8];
+		$res['protocol'] = $matches[9];
+		$ips = explode(":",$matches[10]);
+		$res['ip_from'] = $ips[0];
+		$res['port_from'] = $ips[1];
+		$ipd = explode(":",$matches[11]);
+		$res['ip_to'] = $ipd[0];
+		$res['port_to'] = $ipd[1];
+		$res['direction'] = $matches[12]." ".$matches[13];
+		$res['ifconf'] = $matches[14];
+		*/
+		return $res;
+	}
+	return FALSE;
+}
+
 function ipviking_api_call($log)
 {
 	global $conf;
