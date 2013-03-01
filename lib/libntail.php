@@ -58,8 +58,8 @@ function ipviking_api_call($log)
   	  $ip_from = $log['ip'];
   
   if(ip_is_private($ip_from)) {
-  	$log['ip_from_ipq'] = 509;
-  	$log['ip_from_cc'] = "Private IP";
+  	$log['ip_from_ipq'] = 0;
+  	$log['ip_from_cc'] = "-";
   	$log['ip_from_city'] ='-';
   	$log['ip_from_org'] ='-';
   	$log['categories'] = '';
@@ -167,7 +167,6 @@ function display_logline($log)
 	  echo str_pad($log['host'],8)." ";                                       // substr(10)
 	  echo str_pad($log['ip_from_ipq'],20," ",STR_PAD_LEFT)." ";              // 6
 	  echo str_pad($log['ip_from_cc'],20)." ";                                // 
-	  //echo str_pad($log['ip_from_city'],12)." ";                            //
 	  echo str_pad($log['ip_from_org'],40)." ";								  //
 	  echo str_pad($log['protocol'],4)." ";									  //
 	  echo "".str_pad($log['ip_from'].":".$log['port_from'],48)." ";
@@ -175,12 +174,12 @@ function display_logline($log)
 	  echo "".str_pad($log['ip_to'].":".$log['port_to'],48)." ";
   }
   if($conf['type']=="nginx") {
-  	echo "".str_pad($log['ip'],20)." ";
+  	echo "".str_pad($log['ip'],30)." ";
   	echo str_pad($log['ip_from_ipq'],20," ",STR_PAD_LEFT)." ";
   	echo str_pad($log['ip_from_cc'],20)." ";
   	echo str_pad($log['ip_from_org'],40)." ";
-  	echo str_pad($log['verb'],20)." ";
-  	echo str_pad($log['uri'],40)." ";  	
+  	echo str_pad($log['verb'],4)." ";
+  	echo str_pad($log['uri'],50)." ";  	
   }
   echo $log['categories']."";
   echo "\n";

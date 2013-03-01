@@ -11,6 +11,7 @@ if($conf['debug'])
 else 
 	error_reporting(0);			// debug settings
 
+$filter = FALSE;
 $missing_f = TRUE;
 $help=FALSE;
 $do_color = TRUE;				// default pretty
@@ -34,10 +35,15 @@ if(isset($options['f']) AND $options['f']!="") {
         $missing_f=TRUE;
         echo "Missing mandatory -f <filename>\n";
 }
+
 if(isset($options['t']) AND $options['t']!="") {
         $type = $options['t'];
 } 
 
+if(isset($options['g']) AND $options['g']!="") {
+        $pattern = $options['g'];
+        $filter = TRUE;
+} 
 if($help || $missing_f) {
         print("\t\tIPViking API tail like log watcher!\n\n
                 Integrate intelligence into log files, and supports
@@ -48,6 +54,7 @@ if($help || $missing_f) {
                 \t-h           \t\tThis help\n
                 \t-c           \t\tskip coloring\n
                 \t-i           \t\tskip IPviking API call\n
+        		\t-g [expression] \tFilter out expression\n
                 So enjoy, please feedback this way ts@norse-cop.com\n
                 http://norse-corp.com 
                 http://ipviking.com\n\n");
@@ -66,6 +73,10 @@ $handle = popen("tail -F ".$filename." 2>&1", 'r');
 while(!feof($handle)) 
 {
     $buffer = fgets($handle);
+    if($filter) {
+    	if(strpos($buffer,$pattern))
+    		continue;
+    }
     if($type=="ipfw")
 	    $logarray = split_ipfw_words($buffer);
     elseif($type=="nginx")
