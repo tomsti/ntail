@@ -52,7 +52,11 @@ function ipviking_api_call($log)
 {
   global $conf;
   $memcache = memcache_pconnect($conf['memcached_host'], $conf['memcached_port']);
-  $ip_from = $log['ip_from'];
+  if($conf['type']=="ipfw")
+	  $ip_from = $log['ip_from'];
+  elseif($conf['type']=="nginx")
+  	  $ip_from = $log['ip'];
+  
   $categories = ''; $x=0;
 
   $ip_from_md5 = md5($ip_from);
