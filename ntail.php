@@ -1,4 +1,4 @@
-#!/usr/local/bin/php 
+#!/usr/local/bin/php
 <?php
 
 error_reporting(E_ALL);			// debug settings
@@ -7,7 +7,7 @@ $help=FALSE;
 $do_color = TRUE;				// default pretty
 $do_ipviking = TRUE;			// default API lookup
 $filename = '';
-$type='ipfw';					// default type
+$type='';					// default type
 $conf = array();				// conf file settings
 
 $options = getopt("f:t:hci");
@@ -32,7 +32,8 @@ if(isset($options['t']) AND $options['t']!="")
         $type = $options['t'];
         if($type!='ipfw' || $type!='apache' || $type!='auth' || $type!='nginx' || $type!='ipviking')
         {
-                $type='ipfw';
+                echo "Unsupported Log type\n";
+                $help=TRUE;
         } 
 } else {
         $type = 'ipfw';
