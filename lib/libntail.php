@@ -35,27 +35,14 @@ function split_nginx_words($logbuffer)
 	// pattern to match all ipfw syslog msg
 	//IP - - [DATETIME] "GET|POST|PUT UR HTTP/1.1" CODE BYTES "HOST" "USER-AGENT" "REF"
 	//50.150.127.59 - - [28/Feb/2013:23:23:13 -0800] "GET /json/top_country_attacks/since/1362122531 HTTP/1.1" 200 631 "http://www.norse-corp.com/" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17" "-"
-	preg_match('/[^ ]+ \- \[(.+?)\] "(.+?)" "([^ ]+) ([^ ]+) .*?" ([0-9]+) \(([0-9]+)\) "(.*?)" "([^ ]+) (.*?)" \[([0-9.]+)\]/', $logbuffer, $matches);
-	var_dump($matches);
-		
-	/*
-	$res['time'] = $matches[1]." ".$matches[2];
-		$res['pri'] = $matches[3];
-		$res['host'] = substr($matches[4],0,8);
-		$res['level'] = $matches[5];
-		$res['app'] = $matches[6];
-		$res['rulenum'] = $matches[7];
-		$res['action'] = $matches[8];
-		$res['protocol'] = $matches[9];
-		$ips = explode(":",$matches[10]);
-		$res['ip_from'] = $ips[0];
-		$res['port_from'] = $ips[1];
-		$ipd = explode(":",$matches[11]);
-		$res['ip_to'] = $ipd[0];
-		$res['port_to'] = $ipd[1];
-		$res['direction'] = $matches[12]." ".$matches[13];
-		$res['ifconf'] = $matches[14];
-		*/
+	preg_match('@^(.*) \- \- \[(.+?)\] "(.*?) (.*?) (.*?)" ([0-9]+) ([0-9]+) "(.*?)" "(.*?)" "(.*?)"@i', $logbuffer, $matches);
+	//var_dump($matches);
+	if(!empty($matches))	{
+		$res['time'] = $matches[2];
+		$res['verb'] = $matches[3];
+		$res['ip'] = $matches[1];
+		$res['domain'] = $matches[8];
+		$res['uri'] = $matches[4];
 		return $res;
 	}
 	return FALSE;
@@ -63,10 +50,9 @@ function split_nginx_words($logbuffer)
 
 function ipviking_api_call($log)
 {
-	global $conf;
-  $memcache = memcache_pconnect('10.0.0.3', 11211);
+  global $conf;
+  $memcache = memcache_pconnect($conf['memcached_host'], $conf['memcached_port']);
   $ip_from = $log['ip_from'];
-  $ip_to = $log['ip_to'];
   $categories = ''; $x=0;
 
   $ip_from_md5 = md5($ip_from);
@@ -126,7 +112,7 @@ function ipviking_api_call($log)
 }
 function color_log_strings($log)
 {
-
+	global $conf;
   // timestamp
   if($log['time']) $log['time']="\033[1;37m\033[44m".$log['time']."\033[0m";
   
@@ -137,7 +123,6 @@ function color_log_strings($log)
   elseif($log['ip_from_ipq']>=1) $log['ip_from_ipq']="\033[1;32m".$log['ip_from_ipq']."\033[1;39m";
   else $log['ip_from_ipq']="\033[1;37m".$log['ip_from_ipq']."\033[1;39m";
     
-  
   // company name
   if($log['ip_from_cc']=="United States") {
     if($log['ip_from_org']) 
@@ -146,32 +131,45 @@ function color_log_strings($log)
     if($log['ip_from_org']) $log['ip_from_org']="\033[1;37m".$log['ip_from_org']."\033[1;39m";
   }
   
-  // ip_from
-  if($log['ip_from']) $log['ip_from']="\033[1;34m".$log['ip_from']."\033[1;39m";  
-  if($log['port_from']) $log['port_from']="\033[1;35m".$log['port_from']."\033[1;39m";
-  
-  // ip_to
-  if($log['ip_to']) $log['ip_to']="\033[1;35m".$log['ip_to']."\033[1;39m";
-  if($log['port_to']) $log['port_to']="\033[1;34m".$log['port_to']."\033[1;39m";
-  
+  if($conf['type']=="ipfw") {
+	  // ip_from
+	  if($log['ip_from']) $log['ip_from']="\033[1;34m".$log['ip_from']."\033[1;39m";    
+	  if($log['port_from']) $log['port_from']="\033[1;35m".$log['port_from']."\033[1;39m";
+	  // ip_to
+	  if($log['ip_to']) $log['ip_to']="\033[1;35m".$log['ip_to']."\033[1;39m";
+	  if($log['port_to']) $log['port_to']="\033[1;34m".$log['port_to']."\033[1;39m";
+  }
+  if($conf['type']=="nginx") {
+  	if($log['ip']) $log['ip_from']="\033[1;34m".$log['ip_from']."\033[1;39m";
+  }
   return($log);
 }
 function display_logline($log)
 {
-  //array to display
-  //echo $log['time']." ";                                                //
-  echo str_pad($log['host'],8)." ";                                        // substr(10)
-  echo str_pad($log['ip_from_ipq'],20," ",STR_PAD_LEFT)." ";                // 6
-  echo str_pad($log['ip_from_cc'],20)." ";                                  // 
-  //echo str_pad($log['ip_from_city'],12)." ";                                //
-  echo str_pad($log['ip_from_org'],40)." ";
-  echo str_pad($log['protocol'],4)." ";
-  echo "".str_pad($log['ip_from'].":".$log['port_from'],48)." ";
-  echo "> ";
-  echo "".str_pad($log['ip_to'].":".$log['port_to'],48)." ";
+  global $conf;
+  
+  if($conf['type']=="ipfw") {
+	  //echo $log['time']." ";                                                //
+	  echo str_pad($log['host'],8)." ";                                       // substr(10)
+	  echo str_pad($log['ip_from_ipq'],20," ",STR_PAD_LEFT)." ";              // 6
+	  echo str_pad($log['ip_from_cc'],20)." ";                                // 
+	  //echo str_pad($log['ip_from_city'],12)." ";                            //
+	  echo str_pad($log['ip_from_org'],40)." ";								  //
+	  echo str_pad($log['protocol'],4)." ";									  //
+	  echo "".str_pad($log['ip_from'].":".$log['port_from'],48)." ";
+	  echo "> ";
+	  echo "".str_pad($log['ip_to'].":".$log['port_to'],48)." ";
+  }
+  if($conf['type']=="nginx") {
+  	echo "".str_pad($log['ip'],48)." ";
+  	echo str_pad($log['ip_from_ipq'],20," ",STR_PAD_LEFT)." ";
+  	echo str_pad($log['ip_from_cc'],20)." ";
+  	echo str_pad($log['ip_from_org'],40)." ";
+  	echo str_pad($log['verb'],20)." ";
+  	echo str_pad($log['uri'],40)." ";  	
+  }
   echo $log['categories']."";
   echo "\n";
-  
 }
 
 ?>

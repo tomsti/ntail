@@ -54,6 +54,8 @@ include("/usr/local/lib/ipviking/libntail.php");
 // parse conf file into conf
 // scan more dirs later for conf file
 $conf = parse_ini_file("/usr/local/etc/ntail.conf");
+// supplement conf
+$conf['type'] = $type;
 
 $handle = popen("tail -F ".$filename." 2>&1", 'r');
 while(!feof($handle)) 
