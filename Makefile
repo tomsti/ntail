@@ -5,11 +5,7 @@
 
 LIBDIR=/usr/local/lib/ipviking
 INSTALLDIR=/usr/local/bin/
-CONFDIR=/usr/local/etc
-PACKAGE=ntail
-SRC=ntail.php
-CONF=ntail.conf
-
+CONFDIR=/usr/local/etc/
 
 # need php 5+
 # need memcache/curl/
@@ -17,23 +13,23 @@ CONF=ntail.conf
 all: conf copy installlib install
 
 installlib: $(LIBDIR)
-	install -o root -m 700 lib/libntail.php $(LIBDIR)
-	install -o root -m 700 lib/libipviking.php $(LIBDIR)
+        install -o root -m 700 ${.CURDIR}/lib/libntail.php $(LIBDIR)
+        install -o root -m 700 ${.CURDIR}/lib/libipviking.php $(LIBDIR)
 
 conf:
-	install -o root -m 700 ntail.conf $(CONFDIR)
+        install -o root -m 700 ntail.conf $(CONFDIR)
 
 copy:
-	cp $(SRC) $(PACKAGE)
+        cp ntail.php ntail
 
 install: installlib conf copy
-	install -o root -m 700 ntail $(INSTALLDIR)
+        install -o root -m 700 ntail $(CONFDIR)
 
 $(LIBDIR):
-	mkdir $(LIBDIR)
+        mkdir $(LIBDIR)
 
 clean: rmlibs
-	rm -f *~
+        rm -f *~
 
 rmlibs:
-	rm -rf $(LIBDIR)
+        rm -rf $(LIBDIR)
