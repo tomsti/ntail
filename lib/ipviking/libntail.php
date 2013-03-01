@@ -31,6 +31,7 @@ function split_ipfw_words($logbuffer)
 
 function ipviking_api_call($log)
 {
+	global $conf;
   $memcache = memcache_pconnect('10.0.0.3', 11211);
   $ip_from = $log['ip_from'];
   $ip_to = $log['ip_to'];
@@ -56,8 +57,8 @@ function ipviking_api_call($log)
   }
   if(empty($IPViking_json)) 
   {
-    $requestdata = array('apikey' => '2749597cbef5b9a6abfb91cd7ba4ba4e8b0341814900ebe5bc614b9366e490ab','method' => 'ipq','ip' => $ip_from);
-    $IPViking = new IPvikingRequest("http://us.api.ipviking.com/api/", "POST",$requestdata);
+    $requestdata = array('apikey' => $conf['APIKEY'],'method' => 'ipq','ip' => $ip_from);
+    $IPViking = new IPvikingRequest($conf['APIURL'], "POST",$requestdata);
     $IPViking->execute();
     $IPViking_header = $IPViking->getResponseInfo();
     $IPViking_body = $IPViking->getResponseBody();

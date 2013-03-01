@@ -1,13 +1,14 @@
 #!/usr/local/bin/php 
 <?php
 
-error_reporting(E_ALL);
+error_reporting(E_ALL);			// debug settings
 $missing_f = TRUE;
 $help=FALSE;
-$do_color = TRUE;
-$do_ipviking = TRUE;
+$do_color = TRUE;				// default pretty
+$do_ipviking = TRUE;			// default API lookup
 $filename = '';
-$type='ipfw';
+$type='ipfw';					// default type
+$conf = array();				// conf file settings
 
 $options = getopt("f:t:hci");
 if(isset($options['h']))  $help = TRUE;
@@ -57,6 +58,10 @@ if($help || $missing_f)
 include("/usr/local/lib/ipviking/libipviking.php");
 //ntail libs
 include("/usr/local/lib/ipviking/libntail.php");
+
+// parse conf file into conf
+// scan more dirs later for conf file
+$conf = parse_ini_file("/usr/local/etc/ntail.conf");
 
 $handle = popen("tail -F ".$filename." 2>&1", 'r');
 while(!feof($handle)) 
