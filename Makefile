@@ -17,7 +17,7 @@ installlib: $(LIBDIR)
 	install -o root -m 700 ${.CURDIR}/lib/libipviking.php $(LIBDIR)
 
 conf:
-	install -o root -m 700 ntail.conf $(CONFDIR)
+	[ -f $(CONFDIR)ntail.conf ] || install -o root -m 700 ntail.conf $(CONFDIR)
 
 copy:
 	cp ntail.php ntail
