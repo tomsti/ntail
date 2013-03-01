@@ -1,0 +1,5 @@
+# need php 5+
+# need memcache curl and wits
+
+# only tested on FreeBSD
+
