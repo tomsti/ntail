@@ -144,7 +144,7 @@ function color_log_strings($log)
 	  if($log['port_to']) $log['port_to']="\033[1;34m".$log['port_to']."\033[1;39m";
   }
   if($conf['type']=="nginx") {
-  	if($log['ip']) $log['ip_from']="\033[1;34m".$log['ip_from']."\033[1;39m";
+  	if($log['ip']) $log['ip']="\033[1;34m".$log['ip']."\033[1;39m";
   }
   return($log);
 }
@@ -165,7 +165,7 @@ function display_logline($log)
 	  echo "".str_pad($log['ip_to'].":".$log['port_to'],48)." ";
   }
   if($conf['type']=="nginx") {
-  	echo "".str_pad($log['ip'],48)." ";
+  	echo "".str_pad($log['ip'],20)." ";
   	echo str_pad($log['ip_from_ipq'],20," ",STR_PAD_LEFT)." ";
   	echo str_pad($log['ip_from_cc'],20)." ";
   	echo str_pad($log['ip_from_org'],40)." ";
