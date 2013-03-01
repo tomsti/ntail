@@ -23,7 +23,7 @@ copy:
 	cp ntail.php ntail
 
 install: installlib conf copy
-	install -o root -m 700 ntail $(CONFDIR)
+	install -o root -m 755 ntail $(CONFDIR)
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
