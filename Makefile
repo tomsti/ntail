@@ -13,23 +13,23 @@ CONFDIR=/usr/local/etc/
 all: conf copy installlib install
 
 installlib: $(LIBDIR)
-        install -o root -m 700 ${.CURDIR}/lib/libntail.php $(LIBDIR)
-        install -o root -m 700 ${.CURDIR}/lib/libipviking.php $(LIBDIR)
+	install -o root -m 700 ${.CURDIR}/lib/libntail.php $(LIBDIR)
+	install -o root -m 700 ${.CURDIR}/lib/libipviking.php $(LIBDIR)
 
 conf:
-        install -o root -m 700 ntail.conf $(CONFDIR)
+	install -o root -m 700 ntail.conf $(CONFDIR)
 
 copy:
-        cp ntail.php ntail
+	cp ntail.php ntail
 
 install: installlib conf copy
-        install -o root -m 700 ntail $(CONFDIR)
+	install -o root -m 700 ntail $(CONFDIR)
 
 $(LIBDIR):
-        mkdir $(LIBDIR)
+	mkdir $(LIBDIR)
 
 clean: rmlibs
-        rm -f *~
+	rm -f *~
 
 rmlibs:
-        rm -rf $(LIBDIR)
+	rm -rf $(LIBDIR)
